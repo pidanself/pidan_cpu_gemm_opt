@@ -127,7 +127,8 @@
 .endm
 
 
-/* m=6 k=? n=16*/
+/* MR KC NR */
+/* m=6 k=? n=16 */
 /* A pannel col major, B pannel row major, C row major*/
 /* param rdi:      mat a */
 /* param rsi:      mat b */
@@ -144,9 +145,8 @@ _sgemm_kernel_6x16:
     pushq %r14
 
     /* get parameters from caller */
-    /*movq 8(%rsp), %r12*/
-    /*movslq %r12d, %r12*/
-    movq $16, %r12
+    movl 32(%rsp), %r12d
+    movslq %r12d, %r12
     movslq %r9d, %r9
     movq %r9, %r8
     subq $3, %r8
