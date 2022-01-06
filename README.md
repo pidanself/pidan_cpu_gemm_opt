@@ -6,8 +6,8 @@ TODO:
 - [ ] Pack matrixs
 - [x] Loop NR : NC
 - [x] Loop MR : MC
-- [ ] Loop NC : N
-- [ ] Loop KC : K
-- [ ] Loop MC : M
+- [x] Loop NC : N
+- [x] Loop KC : K
+- [x] Loop MC : M
 - [ ] Elegant makefile 
 - [ ] Test tools
