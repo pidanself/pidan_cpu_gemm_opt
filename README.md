@@ -9,5 +9,5 @@ TODO:
 - [x] Loop NC : N
 - [x] Loop KC : K
 - [x] Loop MC : M
-- [ ] Elegant makefile 
+- [x] Elegant makefile 
 - [ ] Test tools
