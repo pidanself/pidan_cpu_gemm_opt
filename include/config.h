@@ -1,4 +1,4 @@
-
+#include <time.h>
 void sgemm_kernel_6x16(const float *A, const float *B, float *C, int m, int n, int k, int ldc);
 void sgemm_mc_nc(
     int mc,
@@ -18,3 +18,6 @@ void sgemm_mc_nc(
 void getOptimizeMCNCKC(int m, int n, int k, int *mc, int *nc, int *kc);
 void *__aligned_malloc(unsigned long required_bytes, unsigned long alignment);
 void __aligned_free(void *p);
+// pack
+void sgemm_pack_a_mc_kc(int mc, int nc, int kc, const float *A, int lda, float *A_pack);
+void sgemm_pack_b_kc_nc(int mc, int nc, int kc, const float *B, int ldb, float *B_pack);
