@@ -1,5 +1,5 @@
 CC = /usr/local/Cellar/gcc/11.2.0/bin/gcc
-CFLAGS = -O3 -fopenmp
+CFLAGS = -O3
 AR = ar
 ARFLAGS = cr
 
@@ -27,4 +27,4 @@ $(OBJA):%.o : %.S
 	$(CC) -c $(INCLUDE) $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf $(OBJC) $(OBJA)
+	rm -rf $(OBJC) $(OBJA) ../lib/$(TARGET)

@@ -1,10 +1,5 @@
 #include "config.h"
 
-int min(int a, int b)
-{
-    return a < b ? a : b;
-}
-
 // C row major, A row major, B row major
 void sgemm_m_n(
     int m,
