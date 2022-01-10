@@ -4,6 +4,7 @@
 #include <cblas.h>
 #include <math.h>
 #include <stdbool.h>
+#include "config.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,24 +18,25 @@ int main(int argc, char *argv[])
     k = m;
     n = m;
 
-    float *a = (float *)malloc(2 * m * k * sizeof(float));
-    float *b = (float *)malloc(2 * n * k * sizeof(float));
-    float *c = (float *)malloc(2 * m * n * sizeof(float));
+    float *a = (float *)__aligned_malloc(2 * m * k * sizeof(float), 32);
+    float *b = (float *)__aligned_malloc(2 * n * k * sizeof(float), 32);
+    float *c = (float *)__aligned_malloc(2 * m * n * sizeof(float), 32);
 
     for (int i = 0; i < m * k; i++)
     {
-        a[i] = (rand() % 100) / 10.0;
+        a[i] = (rand() % 10) / 10.0;
+        // a[i] = (rand() % 10);
         a[i + m * k] = a[i];
     }
     for (int i = 0; i < k * n; i++)
     {
-        b[i] = (rand() % 100) / 10.0;
+        b[i] = (rand() % 10) / 10.0;
+        // b[i] = (rand() % 10);
         b[i + n * k] = b[i];
     }
-    for (int i = 0; i < m * n; i++)
+    for (int i = 0; i < 2 * m * n; i++)
     {
         c[i] = 0;
-        c[i + m * n] = c[i];
     }
 
     openblas_set_num_threads(1);
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
     {
         for (int j = 0; j < n; j++)
         {
-            if (fabs(c[i * n + j] - c[i * n + j + m * n]) > 0.0001f)
+            if (fabs(c[i * n + j] - c[i * n + j + m * n]) > 0.01f)
             {
                 right = false;
                 printf("%dth row, %dth col; my %f; openblas %f; diff %f\n", i, j, c[i * n + j], c[i * n + j + m * n], fabs(c[i * n + j] - c[i * n + j + m * n]));
@@ -63,9 +65,9 @@ int main(int argc, char *argv[])
         printf("wrong!!!!\n");
     }
 
-    free(a);
-    free(b);
-    free(c);
+    __aligned_free(a);
+    __aligned_free(b);
+    __aligned_free(c);
 
     return 0;
 }

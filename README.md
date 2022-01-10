@@ -11,3 +11,4 @@ TODO:
 - [x] Loop MC : M
 - [x] Elegant makefile 
 - [ ] Test tools
+- [ ] why errors are so big with openblas? Is that normal?

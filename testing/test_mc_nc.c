@@ -7,7 +7,14 @@
 #include <math.h>
 #include <stdbool.h>
 
-extern void sgemm_kernel_6x16(const float *A, const float *B, float *C, int m, int n, int k, int ldc);
+extern void sgemm_mc_nc(
+    int mc,
+    int nc,
+    int kc,
+    const float *packA,
+    const float *packB,
+    float *C,
+    int ldc);
 
 static double
 get_time(struct timespec *start, struct timespec *end)
@@ -17,13 +24,15 @@ get_time(struct timespec *start, struct timespec *end)
 
 int main(int argc, char *argv[])
 {
-    int m = 6, k, n = 16;
-    if (argc != 2)
+    int m, k, n;
+    if (argc != 4)
     {
-        printf("Usage: %s k\n", argv[0]);
+        printf("Usage: %s m n k\n", argv[0]);
         return 0;
     }
-    k = atoi(argv[1]);
+    m = atoi(argv[1]);
+    n = atoi(argv[2]);
+    k = atoi(argv[3]);
 
     printf("all need %ld Bytes\n", 4L * ((m * k) + m * n + k * n));
 
@@ -37,15 +46,17 @@ int main(int argc, char *argv[])
     float *b = (float *)__aligned_malloc(2 * n * k * sizeof(float), 32);
     float *c = (float *)__aligned_malloc(2 * m * n * sizeof(float), 32);
 
+    float *A_pack = (float *)__aligned_malloc(m * k * sizeof(float), 32);
+    float *B_pack = (float *)__aligned_malloc(n * k * sizeof(float), 32);
     for (int i = 0; i < m * k; i++)
     {
-        a[i] = (rand() % 10) / 10.0;
+        a[i] = (rand() % 10);
         // a[i] = i % 10;
         a[i + m * k] = a[i];
     }
     for (int i = 0; i < k * n; i++)
     {
-        b[i] = (rand() % 10) / 10.0;
+        b[i] = (rand() % 10);
         // b[i] = i % 10;
         b[i + n * k] = b[i];
     }
@@ -65,13 +76,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-    for (int i = 0; i < m; i++)
-    {
-        for (int j = 0; j < k; j++)
-        {
-            a[i + j * m] = a[i * k + j + m * k];
-        }
-    }
     for (int i = 0; i < k; i++)
     {
         for (int j = 0; j < n; j++)
@@ -88,7 +92,9 @@ int main(int argc, char *argv[])
     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1, a + m * k, k, b + n * k, n, 0, c + m * n, n);
 
     // execute pidan's kernel
-    sgemm_kernel_6x16(a, b, c, m, n, k, n);
+    sgemm_pack_a_mc_kc(m, k, a, k, A_pack);
+    sgemm_pack_b_kc_nc(n, k, b, n, B_pack);
+    sgemm_mc_nc(m, n, k, A_pack, B_pack, c, n);
     printf("----------------results------------------\n");
     // not precise but useful
     bool right = true;

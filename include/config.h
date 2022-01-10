@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdio.h>
 void sgemm_kernel_6x16(const float *A, const float *B, float *C, int m, int n, int k, int ldc);
 void sgemm_mc_nc(
     int mc,
@@ -21,5 +22,5 @@ void __aligned_free(void *p);
 int min(int a, int b);
 
 // pack
-void sgemm_pack_a_mc_kc(int mc, int nc, int kc, const float *A, int lda, float *A_pack);
-void sgemm_pack_b_kc_nc(int mc, int nc, int kc, const float *B, int ldb, float *B_pack);
+void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack);
+void sgemm_pack_b_kc_nc(int nc, int kc, const float *B, int ldb, float *B_pack);

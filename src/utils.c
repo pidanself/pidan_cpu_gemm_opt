@@ -31,6 +31,12 @@ void getOptimizeMCNCKC(int m, int n, int k, int *mc, int *nc, int *kc)
         *nc = 448;
         *kc = 352;
     }
+    if (m == 48 && n == 48 && k == 48)
+    {
+        *mc = 48;
+        *nc = 48;
+        *kc = 48;
+    }
 }
 
 int min(int a, int b)
