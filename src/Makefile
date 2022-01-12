@@ -3,7 +3,7 @@ CFLAGS = -O3
 AR = ar
 ARFLAGS = cr
 
-INCLUDE = -I../include
+INCLUDE = -I../include -mavx2
 LIB = 
 
 TARGET = pidan_gemm.a
