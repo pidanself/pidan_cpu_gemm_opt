@@ -6,17 +6,17 @@ void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
 {
     int mr = PIDAN_MR;
     // v0 no optimize
-    for (int i = 0; i < mc; i += mr)
-    {
-        for (int mm = 0; mm < mr; mm++)
-        {
-            for (int kk = 0; kk < kc; kk++)
-            {
-                A_pack[i * kc + mm + kk * mr] = A[(i + mm) * lda + kk];
-            }
-        }
-    }
-    return;
+    // for (int i = 0; i < mc; i += mr)
+    // {
+    //     for (int mm = 0; mm < mr; mm++)
+    //     {
+    //         for (int kk = 0; kk < kc; kk++)
+    //         {
+    //             A_pack[i * kc + mm + kk * mr] = A[(i + mm) * lda + kk];
+    //         }
+    //     }
+    // }
+    // return;
 
     /* -----------------I'm line:)---------------------- */
     // v1 intrinsics
@@ -30,17 +30,17 @@ void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
     // m_itr
     for (int j = 0; j < m_itr; j++)
     {
-        tempA = A + j * mr * kc;
+        tempA = A + j * mr * lda;
         // k_itr
         for (int i = 0; i < k_itr; i++)
         {
             // load
-            ymm0 = _mm256_load_ps(tempA);
-            ymm1 = _mm256_load_ps(tempA + lda);
-            ymm2 = _mm256_load_ps(tempA + 2 * lda);
-            ymm3 = _mm256_load_ps(tempA + 3 * lda);
-            ymm4 = _mm256_load_ps(tempA + 4 * lda);
-            ymm5 = _mm256_load_ps(tempA + 5 * lda);
+            ymm0 = _mm256_loadu_ps(tempA);
+            ymm1 = _mm256_loadu_ps(tempA + lda);
+            ymm2 = _mm256_loadu_ps(tempA + 2 * lda);
+            ymm3 = _mm256_loadu_ps(tempA + 3 * lda);
+            ymm4 = _mm256_loadu_ps(tempA + 4 * lda);
+            ymm5 = _mm256_loadu_ps(tempA + 5 * lda);
             // reorder
             ymm0t = _mm256_unpacklo_ps(ymm0, ymm1);
             ymm1t = _mm256_unpackhi_ps(ymm0, ymm1);
@@ -64,23 +64,23 @@ void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
             ymm5t = _mm256_permute2f128_ps(ymm2, ymm5, 0x31);
 
             // store
-            _mm256_store_ps(A_pack, ymm0t);
-            _mm256_store_ps(A_pack + 8, ymm1t);
-            _mm256_store_ps(A_pack + 16, ymm2t);
-            _mm256_store_ps(A_pack + 24, ymm3t);
-            _mm256_store_ps(A_pack + 32, ymm4t);
-            _mm256_store_ps(A_pack + 40, ymm5t);
+            _mm256_storeu_ps(A_pack, ymm0t);
+            _mm256_storeu_ps(A_pack + 8, ymm1t);
+            _mm256_storeu_ps(A_pack + 16, ymm2t);
+            _mm256_storeu_ps(A_pack + 24, ymm3t);
+            _mm256_storeu_ps(A_pack + 32, ymm4t);
+            _mm256_storeu_ps(A_pack + 40, ymm5t);
 
             A_pack += mr * 8;
             tempA += 8;
 
             // load
-            ymm0 = _mm256_load_ps(tempA);
-            ymm1 = _mm256_load_ps(tempA + lda);
-            ymm2 = _mm256_load_ps(tempA + 2 * lda);
-            ymm3 = _mm256_load_ps(tempA + 3 * lda);
-            ymm4 = _mm256_load_ps(tempA + 4 * lda);
-            ymm5 = _mm256_load_ps(tempA + 5 * lda);
+            ymm0 = _mm256_loadu_ps(tempA);
+            ymm1 = _mm256_loadu_ps(tempA + lda);
+            ymm2 = _mm256_loadu_ps(tempA + 2 * lda);
+            ymm3 = _mm256_loadu_ps(tempA + 3 * lda);
+            ymm4 = _mm256_loadu_ps(tempA + 4 * lda);
+            ymm5 = _mm256_loadu_ps(tempA + 5 * lda);
             // reorder
             ymm0t = _mm256_unpacklo_ps(ymm0, ymm1);
             ymm1t = _mm256_unpackhi_ps(ymm0, ymm1);
@@ -104,28 +104,39 @@ void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
             ymm5t = _mm256_permute2f128_ps(ymm2, ymm5, 0x31);
 
             // store
-            _mm256_store_ps(A_pack, ymm0t);
-            _mm256_store_ps(A_pack + 8, ymm1t);
-            _mm256_store_ps(A_pack + 16, ymm2t);
-            _mm256_store_ps(A_pack + 24, ymm3t);
-            _mm256_store_ps(A_pack + 32, ymm4t);
-            _mm256_store_ps(A_pack + 40, ymm5t);
+            _mm256_storeu_ps(A_pack, ymm0t);
+            _mm256_storeu_ps(A_pack + 8, ymm1t);
+            _mm256_storeu_ps(A_pack + 16, ymm2t);
+            _mm256_storeu_ps(A_pack + 24, ymm3t);
+            _mm256_storeu_ps(A_pack + 32, ymm4t);
+            _mm256_storeu_ps(A_pack + 40, ymm5t);
             A_pack += mr * 8;
             tempA += 8;
         }
         // k_rem 暂时有bug
-        // for (int j = 0; j < 6; j++)
-        // {
-        //     for (int i = 0; i < k_rem; i++)
-        //     {
-        //         A_pack[j + i * 6] = tempA[j * lda + i];
-        //     }
-        // }
-        // A_pack += 6 * k_rem;
+        for (int j = 0; j < 6; j++)
+        {
+            for (int i = 0; i < k_rem; i++)
+            {
+                A_pack[j + i * 6] = tempA[j * lda + i];
+            }
+        }
+
+        for (int i = 0; i < k_rem; i++)
+        {
+            A_pack[0] = tempA[0];
+            A_pack[1] = tempA[lda];
+            A_pack[2] = tempA[2 * lda];
+            A_pack[3] = tempA[3 * lda];
+            A_pack[4] = tempA[4 * lda];
+            A_pack[5] = tempA[5 * lda];
+            A_pack += 6;
+            tempA++;
+        }
     }
-    //目前只保证正确性，不考虑性能
+    //目前只保证正确性，不考虑性能,当需要做下面计算时，性能势必会有损耗；若要更通用，增加kernel或对此处的打包进行优化
     // m_rem
-    tempA = A + m_itr * mr * kc;
+    tempA = A + m_itr * mr * lda;
     for (int i = 0; i < m_rem; i++)
     {
         for (int j = 0; j < kc; j++)
