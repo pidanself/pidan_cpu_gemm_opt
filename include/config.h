@@ -24,3 +24,4 @@ int min(int a, int b);
 // pack
 void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack);
 void sgemm_pack_b_kc_nc(int nc, int kc, const float *B, int ldb, float *B_pack);
+void sgemm_pack_b_kc_nc_v0(int nc, int kc, const float *B, int ldb, float *B_pack);

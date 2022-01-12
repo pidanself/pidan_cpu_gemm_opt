@@ -83,5 +83,6 @@ int main(int argc, char *argv[])
     }
     __aligned_free(a);
     __aligned_free(A_pack);
+    __aligned_free(A_pack1);
     return 0;
 }

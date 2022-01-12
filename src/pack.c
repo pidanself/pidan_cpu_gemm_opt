@@ -113,15 +113,8 @@ void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
             A_pack += mr * 8;
             tempA += 8;
         }
-        // k_rem 暂时有bug
-        for (int j = 0; j < 6; j++)
-        {
-            for (int i = 0; i < k_rem; i++)
-            {
-                A_pack[j + i * 6] = tempA[j * lda + i];
-            }
-        }
 
+        // k_rem
         for (int i = 0; i < k_rem; i++)
         {
             A_pack[0] = tempA[0];
@@ -153,6 +146,96 @@ void sgemm_pack_b_kc_nc(int nc, int kc, const float *B, int ldb, float *B_pack)
 {
     int nr = PIDAN_NR;
     // v0 no optimize
+    // for (int i = 0; i < nc; i += nr)
+    // {
+    //     for (int kk = 0; kk < kc; kk++)
+    //     {
+    //         for (int nn = 0; nn < nc; nn++)
+    //         {
+    //             B_pack[i * kc + nn + kk * nr] = B[i + nn + kk * ldb];
+    //         }
+    //     }
+    // }
+
+    /* -----------------I'm line:)---------------------- */
+    // v1 intrinsics
+    const float *tempB = B;
+    int k_itr = kc / 8;
+    int k_rem = kc % 8;
+    int n_itr = nc / nr;
+    int n_rem = nc % nr;
+    __m256 ymm0, ymm1, ymm2, ymm3, ymm4, ymm5, ymm6, ymm7;
+    __m256 ymm8, ymm9, ymm10, ymm11, ymm12, ymm13, ymm14, ymm15;
+    // n_itr
+    for (int i = 0; i < n_itr; i++)
+    {
+        tempB = B + i * nr;
+        // k_itr
+        for (int j = 0; j < k_itr; j++)
+        {
+            ymm0 = _mm256_loadu_ps(tempB);
+            ymm1 = _mm256_loadu_ps(tempB + 8);
+            ymm2 = _mm256_loadu_ps(tempB + ldb);
+            ymm3 = _mm256_loadu_ps(tempB + ldb + 8);
+            ymm4 = _mm256_loadu_ps(tempB + 2 * ldb);
+            ymm5 = _mm256_loadu_ps(tempB + 2 * ldb + 8);
+            ymm6 = _mm256_loadu_ps(tempB + 3 * ldb);
+            ymm7 = _mm256_loadu_ps(tempB + 3 * ldb + 8);
+            ymm8 = _mm256_loadu_ps(tempB + 4 * ldb);
+            ymm9 = _mm256_loadu_ps(tempB + 4 * ldb + 8);
+            ymm10 = _mm256_loadu_ps(tempB + 5 * ldb);
+            ymm11 = _mm256_loadu_ps(tempB + 5 * ldb + 8);
+            ymm12 = _mm256_loadu_ps(tempB + 6 * ldb);
+            ymm13 = _mm256_loadu_ps(tempB + 6 * ldb + 8);
+            ymm14 = _mm256_loadu_ps(tempB + 7 * ldb);
+            ymm15 = _mm256_loadu_ps(tempB + 7 * ldb + 8);
+            tempB += 8 * ldb;
+            _mm256_storeu_ps(B_pack, ymm0);
+            _mm256_storeu_ps(B_pack + 8, ymm1);
+            _mm256_storeu_ps(B_pack + 16, ymm2);
+            _mm256_storeu_ps(B_pack + 24, ymm3);
+            _mm256_storeu_ps(B_pack + 32, ymm4);
+            _mm256_storeu_ps(B_pack + 40, ymm5);
+            _mm256_storeu_ps(B_pack + 48, ymm6);
+            _mm256_storeu_ps(B_pack + 56, ymm7);
+            _mm256_storeu_ps(B_pack + 64, ymm8);
+            _mm256_storeu_ps(B_pack + 72, ymm9);
+            _mm256_storeu_ps(B_pack + 80, ymm10);
+            _mm256_storeu_ps(B_pack + 88, ymm11);
+            _mm256_storeu_ps(B_pack + 96, ymm12);
+            _mm256_storeu_ps(B_pack + 104, ymm13);
+            _mm256_storeu_ps(B_pack + 112, ymm14);
+            _mm256_storeu_ps(B_pack + 120, ymm15);
+            B_pack += 128;
+        }
+        // k_rem
+        for (int j = 0; j < k_rem; j++)
+        {
+            ymm0 = _mm256_loadu_ps(tempB);
+            ymm1 = _mm256_loadu_ps(tempB + 8);
+            _mm256_storeu_ps(B_pack, ymm0);
+            _mm256_storeu_ps(B_pack + 8, ymm1);
+            B_pack += 16;
+            tempB += ldb;
+        }
+    }
+    // n_rem
+    tempB = B + n_itr * nr;
+    for (int i = 0; i < n_rem; i++)
+    {
+        for (int j = 0; j < kc; j++)
+        {
+            B_pack[i + j * n_rem] = tempB[i + j * ldb];
+        }
+    }
+    /* -----------------I'm line:)---------------------- */
+    // v2 asm
+}
+
+void sgemm_pack_b_kc_nc_v0(int nc, int kc, const float *B, int ldb, float *B_pack)
+{
+    int nr = PIDAN_NR;
+    // v0 no optimize
     for (int i = 0; i < nc; i += nr)
     {
         for (int kk = 0; kk < kc; kk++)
@@ -163,6 +246,4 @@ void sgemm_pack_b_kc_nc(int nc, int kc, const float *B, int ldb, float *B_pack)
             }
         }
     }
-    // v1 intrinsics
-    // v2 asm
 }
