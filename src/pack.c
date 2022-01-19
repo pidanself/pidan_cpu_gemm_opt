@@ -1,6 +1,8 @@
 #include "config.h"
 #include <immintrin.h>
 
+// ref: https://stackoverflow.com/questions/25622745/transpose-an-8x8-float-using-avx-avx2/25627536#25627536
+// ref: https://stackoverflow.com/questions/29519222/how-to-transpose-a-16x16-matrix-using-simd-instructions
 // without fetch
 void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
 {

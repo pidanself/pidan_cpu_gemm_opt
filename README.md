@@ -11,11 +11,15 @@ TODO:
 - [x] Loop KC : K
 - [x] Loop MC : M
 - [x] Elegant makefile 
-- [ ] Test tools       
+- [x] Test tools       
   - [x]  validity
-  - [ ]  performance
+  - [x]  performance
 - [ ] make 4128 size get 96% cpu perf by tuning 
 - [ ] why errors are so big with openblas? Is that normal?
 - [ ] how useful prefetch is in sgemm_6x16? 
+  - [x] add prefetch
+  - [ ] why prefetch is useful?
 - [ ] how useful prefetch is in A_pack and B_pack?
+  - [x] add prefetch
+  - [ ] why prefetch is useful?
 

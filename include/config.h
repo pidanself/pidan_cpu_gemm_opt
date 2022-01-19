@@ -20,6 +20,7 @@ void getOptimizeMCNCKC(int m, int n, int k, int *mc, int *nc, int *kc);
 void *__aligned_malloc(unsigned long required_bytes, unsigned long alignment);
 void __aligned_free(void *p);
 int min(int a, int b);
+double minf(double a, double b);
 
 // pack
 void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack);
