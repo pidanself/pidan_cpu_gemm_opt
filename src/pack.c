@@ -36,6 +36,13 @@ void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
         // k_itr
         for (int i = 0; i < k_itr; i++)
         {
+            _mm_prefetch(tempA + 16, _MM_HINT_NTA); // prefetch type is not important
+            _mm_prefetch(tempA + 16 + lda, _MM_HINT_NTA);
+            _mm_prefetch(tempA + 16 + 2 * lda, _MM_HINT_NTA);
+            _mm_prefetch(tempA + 16 + 3 * lda, _MM_HINT_NTA);
+            _mm_prefetch(tempA + 16 + 4 * lda, _MM_HINT_NTA);
+            _mm_prefetch(tempA + 16 + 5 * lda, _MM_HINT_NTA);
+
             // load
             ymm0 = _mm256_loadu_ps(tempA);
             ymm1 = _mm256_loadu_ps(tempA + lda);
@@ -175,6 +182,15 @@ void sgemm_pack_b_kc_nc(int nc, int kc, const float *B, int ldb, float *B_pack)
         // k_itr
         for (int j = 0; j < k_itr; j++)
         {
+            // _mm_prefetch(tempB + 8 * ldb, _MM_HINT_NTA); // prefetch type is not important
+            // _mm_prefetch(tempB + 9 * ldb, _MM_HINT_NTA);
+            // _mm_prefetch(tempB + 10 * ldb, _MM_HINT_NTA);
+            // _mm_prefetch(tempB + 11 * ldb, _MM_HINT_NTA);
+            // _mm_prefetch(tempB + 12 * ldb, _MM_HINT_NTA);
+            // _mm_prefetch(tempB + 13 * ldb, _MM_HINT_NTA);
+            // _mm_prefetch(tempB + 14 * ldb, _MM_HINT_NTA);
+            // _mm_prefetch(tempB + 15 * ldb, _MM_HINT_NTA);
+
             ymm0 = _mm256_loadu_ps(tempB);
             ymm1 = _mm256_loadu_ps(tempB + 8);
             ymm2 = _mm256_loadu_ps(tempB + ldb);

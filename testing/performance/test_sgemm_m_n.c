@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     {
         sgemm_m_n(m, n, k, a, b, c);
     }
-    loop_time = 20;
+    loop_time = 5;
     t = DBL_MAX;
     for (i = 0; i < loop_time; i++)
     {
