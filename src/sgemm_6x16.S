@@ -1,45 +1,61 @@
 .macro PIDAN_C_6x16_LD
-    leaq (%rdx, %r12, 8), %r13
-    leaq (%r13, %r12, 8), %r14
+    vmovups (%rdx), %ymm0
+    vmovups 32(%rdx), %ymm1
+    vmovups (%rdx, %r12, 4), %ymm2
+    vmovups 32(%rdx, %r12, 4), %ymm3   
 
-    vmovaps (%rdx), %ymm0
-    vmovaps 32(%rdx), %ymm1
-    vmovaps (%rdx, %r12, 4), %ymm2
-    vmovaps 32(%rdx, %r12, 4), %ymm3   
+    vmovups (%r13), %ymm4
+    vmovups 32(%r13), %ymm5
+    vmovups (%r13, %r12, 4), %ymm6
+    vmovups 32(%r13, %r12, 4), %ymm7  
 
-    vmovaps (%r13), %ymm4
-    vmovaps 32(%r13), %ymm5
-    vmovaps (%r13, %r12, 4), %ymm6
-    vmovaps 32(%r13, %r12, 4), %ymm7  
+    vmovups (%r14), %ymm8
+    vmovups 32(%r14), %ymm9
+    vmovups (%r14, %r12, 4), %ymm10
+    vmovups 32(%r14, %r12, 4), %ymm11
+.endm
 
-    vmovaps (%r14), %ymm8
-    vmovaps 32(%r14), %ymm9
-    vmovaps (%r14, %r12, 4), %ymm10
-    vmovaps 32(%r14, %r12, 4), %ymm11
+.macro PIDAN_CLEAN_REG
+    vxorps	%ymm0, %ymm0, %ymm0
+    vxorps	%ymm1, %ymm1, %ymm1
+    vxorps	%ymm2, %ymm2, %ymm2
+    vxorps	%ymm3, %ymm3, %ymm3
+    vxorps	%ymm4, %ymm4, %ymm4
+    vxorps	%ymm5, %ymm5, %ymm5
+    vxorps	%ymm6, %ymm6, %ymm6
+    vxorps	%ymm7, %ymm7, %ymm7
+    vxorps	%ymm8, %ymm8, %ymm8
+    vxorps	%ymm9, %ymm9, %ymm9
+    vxorps	%ymm10, %ymm10, %ymm10
+    vxorps	%ymm11, %ymm11, %ymm11
+    vxorps	%ymm12, %ymm12, %ymm12
+    vxorps	%ymm13, %ymm13, %ymm13
+    vxorps	%ymm14, %ymm14, %ymm14
+    vxorps	%ymm15, %ymm15, %ymm15
 .endm
 
 .macro PIDAN_C_6x16_ST
-    vmovaps %ymm0, (%rdx)
-    vmovaps %ymm1, 32(%rdx)
-    vmovaps %ymm2, (%rdx, %r12, 4)
-    vmovaps %ymm3, 32(%rdx, %r12, 4)
+    vmovups %ymm0, (%rdx)
+    vmovups %ymm1, 32(%rdx)
+    vmovups %ymm2, (%rdx, %r12, 4)
+    vmovups %ymm3, 32(%rdx, %r12, 4)
 
-    vmovaps %ymm4, (%r13)
-    vmovaps %ymm5, 32(%r13)
-    vmovaps %ymm6, (%r13, %r12, 4)
-    vmovaps %ymm7, 32(%r13, %r12, 4)
+    vmovups %ymm4, (%r13)
+    vmovups %ymm5, 32(%r13)
+    vmovups %ymm6, (%r13, %r12, 4)
+    vmovups %ymm7, 32(%r13, %r12, 4)
 
-    vmovaps %ymm8, (%r14)
-    vmovaps %ymm9, 32(%r14)
-    vmovaps %ymm10, (%r14, %r12, 4)
-    vmovaps %ymm11, 32(%r14, %r12, 4)
+    vmovups %ymm8, (%r14)
+    vmovups %ymm9, 32(%r14)
+    vmovups %ymm10, (%r14, %r12, 4)
+    vmovups %ymm11, 32(%r14, %r12, 4)
 .endm
 
 /* %rsi: b ; %rdi: a */
 .macro PIDAN_C_m6k4n16
     /* iter0 */
-    vmovaps (%rsi), %ymm13
-    vmovaps 32(%rsi), %ymm14
+    vmovups (%rsi), %ymm13
+    vmovups 32(%rsi), %ymm14
     vbroadcastss (%rdi), %ymm12
     vfmadd231ps %ymm12, %ymm13, %ymm0
     vfmadd231ps %ymm12, %ymm14, %ymm1
@@ -60,8 +76,8 @@
     vfmadd231ps %ymm12, %ymm14, %ymm11
 
     /* iter1 */
-    vmovaps 64(%rsi), %ymm13
-    vmovaps 96(%rsi), %ymm14
+    vmovups 64(%rsi), %ymm13
+    vmovups 96(%rsi), %ymm14
     vbroadcastss 24(%rdi), %ymm12
     vfmadd231ps %ymm12, %ymm13, %ymm0
     vfmadd231ps %ymm12, %ymm14, %ymm1
@@ -82,8 +98,8 @@
     vfmadd231ps %ymm12, %ymm14, %ymm11
 
     /* iter2 */
-    vmovaps 128(%rsi), %ymm13
-    vmovaps 160(%rsi), %ymm14
+    vmovups 128(%rsi), %ymm13
+    vmovups 160(%rsi), %ymm14
     vbroadcastss 48(%rdi), %ymm12
     vfmadd231ps %ymm12, %ymm13, %ymm0
     vfmadd231ps %ymm12, %ymm14, %ymm1
@@ -104,8 +120,8 @@
     vfmadd231ps %ymm12, %ymm14, %ymm11
 
     /* iter3 */
-    vmovaps 192(%rsi), %ymm13
-    vmovaps 224(%rsi), %ymm14
+    vmovups 192(%rsi), %ymm13
+    vmovups 224(%rsi), %ymm14
     vbroadcastss 72(%rdi), %ymm12
     vfmadd231ps %ymm12, %ymm13, %ymm0
     vfmadd231ps %ymm12, %ymm14, %ymm1
@@ -151,7 +167,10 @@ _sgemm_kernel_6x16:
     movq %r9, %r8
     subq $3, %r8
 
-    PIDAN_C_6x16_LD /* load c to SIMD regs */
+    leaq (%rdx, %r12, 8), %r13
+    leaq (%r13, %r12, 8), %r14
+    /* PIDAN_C_6x16_LD load c to SIMD regs */
+    PIDAN_C_6x16_LD
     prefetcht0 (%rsi)
     prefetcht0 (%rdi)
     xorq %rax, %rax /* rax: index for loop a */
@@ -169,8 +188,8 @@ _sgemm_kernel_6x16:
 .PIDAN.C.IF.REM:
     cmpq %rax, %r9
     jle .PIDAN.C.NO.REM
-    vmovaps (%rsi), %ymm13
-    vmovaps 32(%rsi), %ymm14
+    vmovups (%rsi), %ymm13
+    vmovups 32(%rsi), %ymm14
     vbroadcastss (%rdi), %ymm12
     vfmadd231ps %ymm12, %ymm13, %ymm0
     vfmadd231ps %ymm12, %ymm14, %ymm1
