@@ -50,16 +50,11 @@ void sgemm_m_n(
         for (int kk = 0; kk < k; kk += kc)
         {
             kc_size = min(k - kk, kc);
-            // printRow(A, m, n, n);
             sgemm_pack_a_mc_kc(mc_size, kc_size, A + kk + mm * k, k, A_pack);
-            // printCol(A_pack, m, n, m);
             for (int nn = 0; nn < n; nn += nc)
             {
                 nc_size = min(n - nn, nc);
-                // printf("mc %d;nc %d;kc %d\n", mm, nn, kk);
-                // printRow(B, k, n, n);
                 sgemm_pack_b_kc_nc(nc_size, kc_size, B + kk * n + nn, n, B_pack);
-                // printRow(B_pack, k, n, n);
                 sgemm_mc_nc(mc_size, nc_size, kc_size, A_pack, B_pack, C + mm * n + nn, n);
             }
         }

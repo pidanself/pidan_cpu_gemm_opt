@@ -32,6 +32,13 @@ void getOptimizeMCNCKC(int m, int n, int k, int *mc, int *nc, int *kc)
         *kc = 160;  // 160
     }
 
+    if (m == 1152 && n == 1152 && k == 1152)
+    {
+        *mc = 1152; // 1872
+        *nc = 224;  // 240
+        *kc = 160;  // 160
+    }
+
     if (m == 48 && n == 48 && k == 48)
     {
         *mc = 48;
