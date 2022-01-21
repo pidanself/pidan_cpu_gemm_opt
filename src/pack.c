@@ -250,6 +250,7 @@ void sgemm_pack_b_kc_nc(int nc, int kc, const float *B, int ldb, float *B_pack)
     // v2 asm
 }
 
+// abandon
 void sgemm_pack_b_kc_nc_v0(int nc, int kc, const float *B, int ldb, float *B_pack)
 {
     int nr = PIDAN_NR;
