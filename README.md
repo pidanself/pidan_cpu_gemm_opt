@@ -14,12 +14,12 @@ TODO:
 - [x] Test tools       
   - [x]  validity
   - [x]  performance
-- [ ] make 4128 size get 96% cpu perf by tuning 
+- [x] make 1152 size get about 90% cpu perf by tuning 
 - [ ] why errors are so big with openblas? Is that normal?
-- [ ] how useful prefetch is in sgemm_6x16? 
+- [x] how useful prefetch is in sgemm_6x16? prefetch in sgemm_6x16 improve about 10 Gflops.
   - [x] add prefetch
-  - [ ] why prefetch is useful?
-- [ ] how useful prefetch is in A_pack and B_pack?
+  - [x] why prefetch is useful? reduce necessary cache miss
+- [x] how useful prefetch is in A_pack and B_pack? prefetch in B_pack useless. prefetch in A_pack improve about 3 Gflops.
   - [x] add prefetch
-  - [ ] why prefetch is useful?
+  - [x] why prefetch is useful? reduce necessary cache miss
 
