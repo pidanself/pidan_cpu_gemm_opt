@@ -167,12 +167,13 @@ _sgemm_kernel_6x16:
     movq %r9, %r8
     subq $3, %r8
 
+    prefetcht0 (%rsi)
+    prefetcht0 (%rdi)
     leaq (%rdx, %r12, 8), %r13
     leaq (%r13, %r12, 8), %r14
     /* PIDAN_C_6x16_LD load c to SIMD regs */
     PIDAN_C_6x16_LD
-    prefetcht0 (%rsi)
-    prefetcht0 (%rdi)
+    
     xorq %rax, %rax /* rax: index for loop a */
 .PIDAN.C.m6k4n16.L1:
     cmpq %rax, %r8

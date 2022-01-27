@@ -24,6 +24,7 @@ void __aligned_free(void *p)
 
 void getOptimizeMCNCKC(int m, int n, int k, int *mc, int *nc, int *kc)
 {
+    // hope kc is 16x, mc must be 6x, nc must be 16x
     // get 84% cpu peak performance
     if (m == 4128 && n == 4128 && k == 4128)
     {

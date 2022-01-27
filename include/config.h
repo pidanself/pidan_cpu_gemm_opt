@@ -1,6 +1,19 @@
 #include <time.h>
 #include <stdio.h>
-void sgemm_kernel_6x16(const float *A, const float *B, float *C, int m, int n, int k, int ldc);
+void sgemm_kernel_6x16(const float *A,
+                       const float *B,
+                       float *C,
+                       int m,
+                       int n,
+                       int k,
+                       int ldc);
+void sgemm_kernel_6x16_c(const float *A,
+                         const float *B,
+                         float *C,
+                         int m,
+                         int n,
+                         int k,
+                         int ldc);
 void sgemm_mc_nc(
     int mc,
     int nc,

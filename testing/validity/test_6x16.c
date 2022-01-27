@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1, a + m * k, k, b + n * k, n, 0, c + m * n, n);
 
     // execute pidan's kernel
-    sgemm_kernel_6x16(a, b, c, m, n, k, n);
+    sgemm_kernel_6x16_c(a, b, c, m, n, k, n);
     printf("----------------results------------------\n");
     // not precise but useful
     bool right = true;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     {
         for (int j = 0; j < n; j++)
         {
-            if (fabs(c[i * n + j] - c[i * n + j + m * n]) > 0.0001f)
+            if (fabs(c[i * n + j] - c[i * n + j + m * n]) > 0.01f)
             {
                 right = false;
                 printf("%dth row, %dth col; my %f; openblas %f; diff %f\n", i, j, c[i * n + j], c[i * n + j + m * n], fabs(c[i * n + j] - c[i * n + j + m * n]));
@@ -112,41 +112,29 @@ int main(int argc, char *argv[])
         printf("wrong!!!!\n");
     }
 
+    // test GFLOPS
+    int i;
+    // warm up
+    for (i = 0; i < loop_time; i++)
+    {
+        sgemm_kernel_6x16(a, b, c, m, n, k, n);
+    }
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+    for (i = 0; i < loop_time; i++)
+    {
+        // sgemm_kernel_6x16(a, b, c, m, n, k, n);
+        sgemm_kernel_6x16_c(a, b, c, m, n, k, n);
+    }
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+
+    t = get_time(&start, &end) / loop_time;
+    gflops = (double)comp / t * 1e-9;
+
+    printf("sgemm_kernel_6x16_c(%d, %d, %d): time = %lf us, perf = %lf GFLOPS.\n", m, n, k, t * 1e6, gflops);
+
+    // free
     __aligned_free(a);
     __aligned_free(b);
     __aligned_free(c);
-
-    // test GFLOPS
-    //  int i;
-    //  // warm up
-    //  for (i = 0; i < loop_time; i++)
-    //  {
-    //      // sgemm_asm_4x8(m, n, k, 0, a, b, 0, c, n);
-    //      // sgemm_kernel_4x8(a, b, c, m, n, k, n);
-    //      // sgemm_asm_6x16(m, n, k, 0, a, b, 0, c, n);
-    //      sgemm_kernel_6x16(a, b, c, m, n, k, n);
-    //  }
-
-    // clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-    // for (i = 0; i < loop_time; i++)
-    // {
-    //     // sgemm_asm_4x8(m, n, k, 0, a, b, 0, c, n);
-    //     // sgemm_kernel_4x8(a, b, c, m, n, k, n);
-    //     // sgemm_asm_6x16(m, n, k, 0, a, b, 0, c, n);
-    //     sgemm_kernel_6x16(a, b, c, m, n, k, n);
-    // }
-    // clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-
-    // t = get_time(&start, &end) / loop_time;
-    // gflops = (double)comp / t * 1e-9;
-
-    // printf("sgemm_asm_6x16(%d, %d, %d): time = %lf us, perf = %lf GFLOPS.\n", m, n, k, t * 1e6, gflops);
-    // for (int i = 0; i < m; i++)
-    // {
-    //     for (int j = 0; j < n; j++)
-    //     {
-    //         printf("%lf;", c[i * n + j]);
-    //     }
-    //     printf("\n");
-    // }
 }

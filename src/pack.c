@@ -3,7 +3,6 @@
 
 // ref: https://stackoverflow.com/questions/25622745/transpose-an-8x8-float-using-avx-avx2/25627536#25627536
 // ref: https://stackoverflow.com/questions/29519222/how-to-transpose-a-16x16-matrix-using-simd-instructions
-// without fetch
 void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
 {
     int mr = PIDAN_MR;
@@ -36,6 +35,7 @@ void sgemm_pack_a_mc_kc(int mc, int kc, const float *A, int lda, float *A_pack)
         // k_itr
         for (int i = 0; i < k_itr; i++)
         {
+            // transpose 6x16 and will get col-major 6x16
             _mm_prefetch(tempA + 16, _MM_HINT_NTA); // prefetch type is not important
             _mm_prefetch(tempA + 16 + lda, _MM_HINT_NTA);
             _mm_prefetch(tempA + 16 + 2 * lda, _MM_HINT_NTA);
